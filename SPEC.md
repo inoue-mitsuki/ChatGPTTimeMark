@@ -1,6 +1,6 @@
-# ChatGPTTimeMark 仕様書
+# TimeStamp 仕様書
 
-現在版：0.1.15。2026-10-04更新。対話型AI主導・反復開発。
+現在版：0.1.16。2026-10-04更新。対話型AI主導・反復開発。
 
 ## 確定仕様
 
@@ -14,7 +14,7 @@
 - 本文・認証情報の保存・ログ・表示側転送、拡張独自の通信、永続保存、解析・広告なし。
 - 通信参照は8MiB・120秒に制限。追加のAPI permissions・host_permissions、Service Worker、外部実行依存なし。
 - 内部名はChatGPTTimeMarkCoreと__chatGPTTimeMarkInstalled。汎用の日時用DOM・CSS・通信識別子は維持。
-- 0.1.15で独自の時計アイコンを追加。
+- 0.1.15で独自の時計アイコンを追加。0.1.16で公開名をTimeStampへ変更。
 
 ## 所在地・公開方針
 
@@ -43,7 +43,7 @@ Chrome実機確認はユーザー指定により対象外。自動テストを�
 - 最新版の全通信・ストレージ実機監査。
 - 個人情報のない実際のChatGPT画面でのストア用スクリーンショット撮影。私的な確認画像は掲載・Git登録しない。
 - ストアID、下書き・署名設定、アカウント前提、カテゴリ等の実画面確認。審査申請・ストア公開は別操作。
-- 完全一致のWeb検索ではChatGPTTimeMark・ChatTimeMarkの該当結果なし。ただし商標調査は未実施。OpenAI公式ガイドラインに基づく公開名見直しをQA.mdで確認中。詳細はdocs/NAME-REVIEW.md。
+- 以前の完全一致検索ではChatGPTTimeMark・ChatTimeMarkの該当結果なし。ただし商標調査は未実施。OpenAI公式ガイドラインに基づく公開名はユーザー指定のTimeStampに確定。TimeStampの同名・商標調査は未実施。詳細はdocs/NAME-REVIEW.md。
 
 過去の詳細な調査・名前変更・失敗はローカルのdocs/HISTORY.mdへ保存。履歴を現在の仕様・確認結果として扱わない。
 

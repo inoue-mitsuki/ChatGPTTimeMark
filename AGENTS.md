@@ -1,8 +1,8 @@
-# ChatGPTTimeMark 開発方針
+# TimeStamp 開発方針
 
 ## 目的と開発方式
 
-* プロジェクト名は ChatGPTTimeMark とする。
+* プロジェクト名は TimeStamp とする。
 
 * 対話型AI主導・反復開発を採用する。
 
