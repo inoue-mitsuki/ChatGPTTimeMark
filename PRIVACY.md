@@ -23,6 +23,10 @@ localStorage、sessionStorage、IndexedDB、chrome.storageへの保存処理は�
 
 拡張独自のネットワークリクエスト、第三者サーバーへの送信、解析、広告、エラー収集はありません。ChatGPT本来の通信はサービス側の処理です。日時情報の受け渡しは同じページ／フレーム内で行います。データの販売、目的外利用、信用判断や融資目的の利用は行いません。
 
+## データ利用の制限
+
+本拡張が参照するユーザーデータは、ユーザー向けの日時表示機能に必要な範囲でのみ利用します。広告、販売、信用判断、目的外の共有や人による閲覧には利用しません。Chrome Web StoreのユーザーデータポリシーのLimited Use要件に従います。
+
 ## 動作範囲と権限
 
 https://chatgpt.com/*の通常画面と、そのURLを読み込むマルチViewのiframeで動作します。content_scriptsによる対象ページへのアクセスを利用します。追加のAPI permissionsおよびhost_permissionsはありません。
