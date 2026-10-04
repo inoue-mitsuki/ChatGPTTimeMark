@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPTTimeMark",
+  "version": "0.1.15",
+  "description": "ChatGPTのユーザーメッセージの作成日時を、端末の現地時間で秒まで表示します。",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "all_frames": true,
+      "js": [
+        "src/core.js",
+        "src/interceptor.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "all_frames": true,
+      "js": [
+        "src/content-runtime.js"
+      ],
+      "css": [
+        "src/content.css"
+      ],
+      "run_at": "document_start",
+      "world": "ISOLATED"
+    }
+  ],
+  "icons": {
+    "48": "icons/icon48.png",
+    "16": "icons/icon16.png",
+    "128": "icons/icon128.png"
+  }
+}
