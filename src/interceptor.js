@@ -10,7 +10,7 @@
   let fetchCalls = 0;
   const endpoints = new Map();
   function status() {
-    if (typeof document !== 'undefined') document.documentElement?.setAttribute('data-chatgpt-timestamp-network', `0.1.15;fetches=${fetchCalls};requests=${requests};records=${cache.size};api=${JSON.stringify([...endpoints])}`);
+    if (typeof document !== 'undefined') document.documentElement?.setAttribute('data-chatgpt-timestamp-network', `0.1.17;fetches=${fetchCalls};requests=${requests};records=${cache.size};api=${JSON.stringify([...endpoints])}`);
   }
   status();
   let route = location.pathname;
@@ -92,10 +92,12 @@
       scheduled = false;
       syncRoute();
       const records = [];
-      const elements = document.querySelectorAll('[data-message-id][data-message-author-role="user"], [data-user-message-bubble="true"]');
+      const dots = core.isDotsRoute(route);
+      const selector = '[data-message-id][data-message-author-role="user"], [data-user-message-bubble="true"]' + (dots ? ', [data-message-id][data-message-author-role="assistant"]' : '');
+      const elements = document.querySelectorAll(selector);
       for (const element of Array.from(elements).slice(0, core.MAX_RECORDS)) {
-        const conversationId = route.match(/\/c\/([^/]+)$/)?.[1];
-        const item = core.reactRecord(element, conversationId);
+        const conversationId = route.match(/\/(?:c|dots)\/([^/]+)\/?$/)?.[1];
+        const item = core.reactRecord(element, conversationId, dots);
         // Share verified records through DOM without relying on postMessage delivery.
         // Carry only a verified message ID, timestamp and route, never message text.
         if (item) {

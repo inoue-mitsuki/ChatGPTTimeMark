@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TimeStamp",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "ChatGPTのユーザーメッセージの作成日時を、端末の現地時間で秒まで表示します。",
   "content_scripts": [
     {

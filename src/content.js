@@ -1,10 +1,11 @@
 (() => {
   "use strict";
   const core = globalThis.ChatGPTTimeMarkCore;
-  const selector = '[data-message-id][data-message-author-role="user"], [data-user-message-bubble="true"]';
+  const userSelector = '[data-message-id][data-message-author-role="user"], [data-user-message-bubble="true"]';
   const cache = new Map();
   let route = location.pathname;
   let scheduled = false;
+  const selectorForRoute = () => core.isDotsRoute(route) ? userSelector + ', [data-message-id][data-message-author-role="assistant"]' : userSelector;
   function syncRoute() {
     const next = location.pathname;
     if (next !== route) {
@@ -17,11 +18,12 @@
   function render() {
     scheduled = false;
     syncRoute();
+    const selector = selectorForRoute();
     document.querySelectorAll('time[data-chatgpt-timestamp]').forEach(stamp => {
       if (!stamp.parentElement?.matches(selector)) stamp.remove();
     });
     document.querySelectorAll(selector).forEach(message => {
-      const id = core.messageId(message);
+      const id = core.messageId(message, core.isDotsRoute(route));
       let seconds = cache.get(id);
       const carrier = message.getAttribute('data-chatgpt-timestamp-record');
       if (carrier && carrier.length <= 512) {
@@ -45,7 +47,7 @@
       const iso = new Date(seconds * 1000).toISOString();
       if (stamp.dateTime !== iso) stamp.dateTime = iso;
     });
-    document.documentElement?.setAttribute('data-chatgpt-timestamp-status', `0.1.15;records=${cache.size};displayed=${document.querySelectorAll('time[data-chatgpt-timestamp]').length}`);
+    document.documentElement?.setAttribute('data-chatgpt-timestamp-status', `0.1.17;records=${cache.size};displayed=${document.querySelectorAll('time[data-chatgpt-timestamp]').length}`);
   }
   function schedule() {
     if (!scheduled) { scheduled = true; setTimeout(render, 100); }

@@ -199,3 +199,22 @@ test('表示処理は重複・ID変更・会話切替・他サイト由来の通
   notify([{ id: user.id, seconds }], '/c/first'); flush();
   assert.equal(user.children.length, 0);
 });
+
+test('DOTS会話だけを対象にし入口や通常会話にはAI表示を拡張しない', () => {
+  assert.equal(core.isDotsRoute('/dots/dot-1'), true);
+  assert.equal(core.isDotsRoute('/dots/dot-1/'), true);
+  for (const route of ['/dots/', '/c/chat-1', '/dots/dot-1/settings', '/other/dots/dot-1']) assert.equal(core.isDotsRoute(route), false);
+});
+
+test('DOTS用React取得は一致するAIの実日時だけを返し本文は返さない', () => {
+  const ai = { ...message, author: { role: 'assistant' } };
+  const root = { tag: 3, stateNode: {} }; root.stateNode.current = root;
+  const row = { memoizedProps: { messages: [ai] }, return: root }; root.child = row;
+  const element = { matches: selector => selector.includes('assistant'), closest: () => null, getAttribute: () => ai.id, '__reactFiber$dots': row };
+  assert.equal(core.reactRecord(element, 'dot-1'), null);
+  assert.deepEqual(core.reactRecord(element, 'dot-1', true), { id: ai.id, seconds });
+  row.memoizedProps.messages = [{ ...ai, create_time: null }];
+  assert.equal(core.reactRecord(element, 'dot-1', true), null);
+  row.memoizedProps.messages = [{ ...ai, id: 'other-message' }];
+  assert.equal(core.reactRecord(element, 'dot-1', true), null);
+});

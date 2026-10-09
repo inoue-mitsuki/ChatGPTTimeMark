@@ -5,8 +5,9 @@
   const validId = id => typeof id === "string" && /^[a-zA-Z0-9_-]{1,128}$/.test(id);
   const validTime = seconds => typeof seconds === "number" && Number.isFinite(seconds)
     && seconds >= 1577836800 && seconds <= Date.now() / 1000 + 86400;
-  function record(message) {
-    if (!message || !validId(message.id) || message.author?.role !== "user"
+  const isDotsRoute = path => typeof path === "string" && /^\/dots\/[a-zA-Z0-9_-]+\/?$/.test(path);
+  function record(message, allowAssistant = false) {
+    if (!message || !validId(message.id) || !(message.author?.role === "user" || (allowAssistant && message.author?.role === "assistant"))
         || !validTime(message.create_time)) return null;
     return { id: message.id, seconds: message.create_time };
   }
@@ -35,8 +36,8 @@
     const pad = value => String(value).padStart(2, "0");
     return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   }
-  function messageId(element) {
-    if (element.matches('[data-message-id][data-message-author-role="user"]')) {
+  function messageId(element, allowAssistant = false) {
+    if (element.matches('[data-message-id][data-message-author-role="user"]') || (allowAssistant && element.matches('[data-message-id][data-message-author-role="assistant"]'))) {
       const id = element.getAttribute('data-message-id');
       return validId(id) ? id : null;
     }
@@ -76,11 +77,11 @@
     }
     return chain.at(-1).stateNode.current === root ? path.reverse() : null;
   }
-  function snapshotRecord(path, id, conversationId) {
+  function snapshotRecord(path, id, conversationId, allowAssistant = false) {
     if (!validId(conversationId)) return null;
     const entry = path.map(node => node.memoizedProps?.entry).find(value =>
       value?.conversationId === conversationId && Array.isArray(value.turn?.items));
-    if (!entry || !entry.turn.items.some(item => item.type === 'user-message'
+    if (!entry || !entry.turn.items.some(item => (item.type === 'user-message' || (allowAssistant && item.type === 'assistant-message'))
       && (item.messageId === id || item.serverMessageId === id))) return null;
     let result = null;
     let mapping = null;
@@ -93,7 +94,7 @@
       if (turns.length > 10000 || turns.filter(turn => turn.id === entry.id && turn.turn === entry.turn).length !== 1) return;
       const candidateMapping = value.renderedConversation.mapping;
       const candidateNode = candidateMapping[id];
-      const candidate = candidateNode?.id === id ? record(candidateNode.message) : null;
+      const candidate = candidateNode?.id === id ? record(candidateNode.message, allowAssistant) : null;
       if (!candidate) return;
       if (mapping && mapping !== candidateMapping) conflict = true;
       mapping = candidateMapping;
@@ -123,8 +124,8 @@
     }
     return conflict ? null : result;
   }
-  function reactRecord(element, conversationId) {
-    const id = messageId(element);
+  function reactRecord(element, conversationId, allowAssistant = false) {
+    const id = messageId(element, allowAssistant);
     if (!id) return null;
     // Read only nearby message props, never search the whole application state.
     for (let dom = element, level = 0; dom && level < 8; dom = dom.parentElement, level++) {
@@ -134,7 +135,7 @@
       for (const start of [fiber, fiber?.alternate]) {
         const path = committedPath(start);
         if (!path) continue;
-        const current = snapshotRecord(path, id, conversationId);
+        const current = snapshotRecord(path, id, conversationId, allowAssistant);
         if (current) return current;
         let item = null;
         let conflict = false;
@@ -143,7 +144,7 @@
           if (Array.isArray(messages)) {
             for (const message of messages.slice(0, MAX_RECORDS)) {
               if (message?.id !== id) continue;
-              const candidate = record(message);
+              const candidate = record(message, allowAssistant);
               if (candidate) {
                 if (item && item.seconds !== candidate.seconds) conflict = true;
                 item = candidate;
@@ -173,7 +174,7 @@
       }
     };
   }
-  const api = Object.freeze({ MAX_RECORDS, validId, validTime, extract, format, streamParser, messageId, reactRecord });
+  const api = Object.freeze({ MAX_RECORDS, isDotsRoute, validId, validTime, extract, format, streamParser, messageId, reactRecord });
   globalThis.ChatGPTTimeMarkCore = api;
   if (typeof module === "object" && module?.exports) module.exports = api;
 })();
